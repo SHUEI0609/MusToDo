@@ -1,73 +1,41 @@
-# React + TypeScript + Vite
+# Band Practice Tracker (曲管理ToDoリスト)
+複数のバンドやプロジェクトで担当する曲が増えてきた際、練習の進捗状況を管理するために作成したToDoリストアプリケーションです。
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 機能一覧
+- **曲情報の登録**:
+  - **必須項目**: 曲名
+  - **任意項目**: イベント名, 演奏期限(日付), メモ, 参考リンク (YouTube, 楽譜, 音源)
+- **進捗ステータス管理**:
+  - 各曲に以下の5段階のステータスを設定できます。
+    - `未着手`
+    - `譜面確認中`
+    - `個人練習中`
+    - `バンド練習中`
+    - `完成`
+- **タスクのグループ化**:
+  - 登録した「イベント名」ごとに曲が自動的にグループ化され、表示されます。
+- **ワンクリック完了機能**:
+  - 曲名の横にあるチェックボタンを押すことで、ステータスを `完成` / `未着手` に素早く切り替えられます。
+- **データの永続化**:
+  - 登録したデータはブラウザのローカルストレージに保存されるため、ページを再読み込みしても消えません。
+- **入力補助**:
+  - イベント名は過去に入力したものから候補が提示され、入力の手間を省きます。
 
-Currently, two official plugins are available:
+## 使い方
+1. 画面下部にある「＋ タスクを追加」ボタンを押すと、入力フォームが表示されます。
+2. **曲名** (必須) をはじめ、必要に応じて **イベント名**、**期限**、**メモ**、**各種URL** を入力します。
+3. 「タスクを追加」ボタンを押すと、リストに曲が追加されます。イベント名で指定したグループに表示されます（指定がない場合は「指定なし」グループ）。
+4. 各曲の右側にあるプルダウンメニューから、練習の進捗に合わせてステータスを更新します。
+5. 曲が仕上がったら、曲名の左にある丸いチェックボタンを押して「完成」にできます。もう一度押すと「未着手」に戻ります。
+6. 不要になったタスクは、右端のゴミ箱アイコンボタンで削除できます。
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 使うタイミング
+- 複数のバンドやプロジェクトを掛け持ちしており、練習曲の進捗をまとめて管理したい時。
+- ライブやスタジオ練習のセットリストが決まり、各曲の完成度を可視化したい時。
+- 個人練習の計画を立て、どの曲から手をつけるべきか整理したい時。
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 使用技術
+- **フロントエンド**: React, TypeScript
+- **ビルドツール**: Vite
+- **コード品質**: ESLint
+- **デプロイ**: gh-pages
