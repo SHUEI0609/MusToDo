@@ -51,6 +51,10 @@ https://shuei0609.github.io/MusToDo/
 
 <img width="1917" height="991" alt="image" src="https://github.com/user-attachments/assets/fd1eef7c-e1c4-4791-a4e0-63dd5c4db803" />
 
+- URLを設定した際にクリックをすると設定したリンクに飛べるようにした。
+
+<img width="1905" height="999" alt="image" src="https://github.com/user-attachments/assets/b7ef0a0c-bde2-4948-bbbf-61417e08384e" />
+
 
 ## 使用技術
 - **フロントエンド**: React, TypeScript
