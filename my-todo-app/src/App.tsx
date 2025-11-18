@@ -1,4 +1,6 @@
-import React, { useState, ChangeEvent, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
+import type { ChangeEvent } from "react";
+import { SuggestionInput } from "./SuggestionInput";
 import "./App.css";
 
 // ステータスの型定義
@@ -36,6 +38,7 @@ function App() {
   });
 
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [showCompleted, setShowCompleted] = useState<Record<string, boolean>>({});
   const [title, setTitle] = useState("");
   const [event, setEvent] = useState("");
   const [deadline, setDeadline] = useState("");
@@ -47,9 +50,11 @@ function App() {
   }, [tasks]);
 
   const currentEventNames = useMemo(() => {
-    const eventSet = new Set(tasks.map(task => task.event));
+    const eventSet = new Set(tasks.map(task => task.event).filter(Boolean)); // filter(Boolean) to remove empty strings
     return Array.from(eventSet);
   }, [tasks]);
+
+
 
   const resetForm = () => {
     setTitle("");
@@ -97,11 +102,15 @@ function App() {
     return tasks.reduce((acc, task) => {
       const eventName = task.event || "指定なし";
       if (!acc[eventName]) {
-        acc[eventName] = [];
+        acc[eventName] = { incomplete: [], completed: [] };
       }
-      acc[eventName].push(task);
+      if (task.status === '完成') {
+        acc[eventName].completed.push(task);
+      } else {
+        acc[eventName].incomplete.push(task);
+      }
       return acc;
-    }, {} as Record<string, Task[]>);
+    }, {} as Record<string, { incomplete: Task[], completed: Task[] }>);
   }, [tasks]);
 
   return (
@@ -116,7 +125,7 @@ function App() {
             <section key={eventName} className="event-section">
               <h2 className="event-title">{eventName}</h2>
               <ul className="task-list">
-                {eventTasks.map((task) => (
+                {eventTasks.incomplete.map((task) => (
                   <li key={task.id} className={`task-item ${task.status === '完成' ? 'completed' : ''}`}>
                     <div className="task-content">
                       <button 
@@ -153,6 +162,57 @@ function App() {
                   </li>
                 ))}
               </ul>
+              {eventTasks.completed.length > 0 && (
+                <div className="completed-tasks-section">
+                  <button 
+                    className="completed-tasks-toggle"
+                    onClick={() => setShowCompleted(prev => ({ ...prev, [eventName]: !prev[eventName] }))}
+                  >
+                    <span className={`toggle-arrow ${showCompleted[eventName] ? 'expanded' : ''}`}>▼</span>
+                    完了済み {eventTasks.completed.length}件
+                  </button>
+                  {showCompleted[eventName] && (
+                    <ul className="task-list completed-list">
+                      {eventTasks.completed.map((task) => (
+                        <li key={task.id} className={`task-item ${task.status === '完成' ? 'completed' : ''}`}>
+                          <div className="task-content">
+                            <button 
+                              className="complete-button" 
+                              onClick={() => updateStatus(task.id, task.status === '完成' ? '未着手' : '完成')}
+                            >
+                              <svg width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2-9.59L15.59 12 10 17.59 6.41 14 7.83 12.59 10 14.77z"></path></svg>
+                            </button>
+                            <div className="task-details">
+                              <p className="task-title">{task.title}</p>
+                              {task.memo && <p className="task-memo">{task.memo}</p>}
+                              <div className="task-meta">
+                                {task.deadline && <span className="task-deadline">{task.deadline}</span>}
+                                <div className="task-links">
+                                  {task.links.youtube && <a href={task.links.youtube} target="_blank" rel="noopener noreferrer">YouTube</a>}
+                                  {task.links.sheet && <a href={task.links.sheet} target="_blank" rel="noopener noreferrer">楽譜</a>}
+                                  {task.links.audio && <a href={task.links.audio} target="_blank" rel="noopener noreferrer">音源</a>}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="task-actions">
+                             <select
+                              value={task.status}
+                              onChange={(e) => updateStatus(task.id, e.target.value as Status)}
+                              className="status-select"
+                            >
+                              {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                            </select>
+                            <button className="delete-button" onClick={() => deleteTask(task.id)}>
+                              <svg width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></svg>
+                            </button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
             </section>
           ))}
         </div>
@@ -172,17 +232,12 @@ function App() {
               placeholder="メモ (例: Bメロのテンポ注意)"
               className="task-textarea"
             />
-            <input
-              type="text"
+            <SuggestionInput
               value={event}
-              onChange={(e) => setEvent(e.target.value)}
+              onChange={setEvent}
+              suggestions={currentEventNames}
               placeholder="イベント名"
-              className="task-input"
-              list="event-suggestions"
             />
-            <datalist id="event-suggestions">
-              {currentEventNames.map((name) => <option key={name} value={name} />)}
-            </datalist>
             <input
               type="date"
               value={deadline}
